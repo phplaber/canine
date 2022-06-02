@@ -6,22 +6,13 @@
 3. 在指定目录下，搜索指定用户组以 `root` 或 `system` 特权用户组身份执行的 `SGID` 可执行文件 
 
 ## 使用
-1. 下载源代码
-``` bash
-git clone https://github.com/phplaber/canine.git
-```
-2. 编译程序，生成可执行文件
-``` bash
-# 1、64位架构则为 arm64 
-# 2、需使用 ndk 工具链 
-# 3、需显示开启 CGO_ENABLED
-env GOOS=android GOARCH=arm CC=/path/to/sdk/ndk/linux-androideabi-clang CGO_ENABLED=1 go build  -o ./bin/ -v ./cmd/canine
-```
-3. 使用 adb 将文件拷贝进 Android
+1. 下载二进制文件  
+下载 `bin` 目录中的二进制文件，`armv7` 和 `armv8` 分别对应 `arm` 和 `arm64` 架构。
+2. 使用 adb 将文件拷贝进 Android
 ``` bash
 adb push /path/to/bin/canine /data/local/tmp/
 ```
-4. 赋予文件执行权限，然后执行
+3. 赋予文件执行权限，然后执行
 ``` bash
 chmod +x canine
 ./canine --help                                    
@@ -33,7 +24,7 @@ canine v0.1
   -u string
     	username, e.g. shell
 ```
-5. 使用示例
+4. 使用示例
 ``` bash
 ./canine -u shell -g shell,log,adb,sdcard_rw /dev /data
 [*] Scanning...
