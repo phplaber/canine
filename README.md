@@ -23,7 +23,9 @@ canine v0.1
     	groupname(s), e.g. shell,log,sdcard_rw
   -u string
     	username, e.g. shell
-# [注意]：最多同时支持5个目录
+# [注意]：
+# 1、由于目录权限问题，尽量使用 root 执行
+# 2、最多同时支持5个目录
 ```
 4. 使用示例
 ``` bash
