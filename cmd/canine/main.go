@@ -27,6 +27,10 @@ func main() {
 	dirpaths := flag.Args()
 
 	fmt.Println("[*] Scanning...")
+	// 最多同时支持5个目录扫描
+	SUIDFilesChan := make(chan []map[string]string, 5)
+	SGIDFilesChan := make(chan []map[string]string, 5)
+	writableFilesChan := make(chan []map[string]string, 5)
 	var wg sync.WaitGroup
 	for _, dirpath := range dirpaths {
 		wg.Add(1)
@@ -34,8 +38,28 @@ func main() {
 		dirpath := dirpath
 		go func() {
 			defer wg.Done()
-			Scan(*owner, *groups, dirpath)
+			Scan(*owner, *groups, dirpath, SUIDFilesChan, SGIDFilesChan, writableFilesChan)
 		}()
 	}
 	wg.Wait()
+	close(SUIDFilesChan)
+	close(SGIDFilesChan)
+	close(writableFilesChan)
+
+	// 合并所有目录结果并输出
+	var SUIDFilesMerged, SGIDFilesMerged, writableFilesMerged []map[string]string
+	for sitems := range SUIDFilesChan {
+		SUIDFilesMerged = append(SUIDFilesMerged, sitems...)
+	}
+	Output(SUIDFilesMerged, "SUID executable")
+
+	for gitems := range SGIDFilesChan {
+		SGIDFilesMerged = append(SGIDFilesMerged, gitems...)
+	}
+	Output(SGIDFilesMerged, "SGID executable")
+
+	for witems := range writableFilesChan {
+		writableFilesMerged = append(writableFilesMerged, witems...)
+	}
+	Output(writableFilesMerged, "Writable")
 }

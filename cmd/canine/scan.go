@@ -9,7 +9,7 @@ import (
 	"github.com/phplaber/canine/pkg/scan"
 )
 
-func output(rst []map[string]string, flag string) {
+func Output(rst []map[string]string, flag string) {
 	fmt.Printf("[*] Found %d entries that are %s\n", len(rst), flag)
 
 	for _, file := range rst {
@@ -17,7 +17,7 @@ func output(rst []map[string]string, flag string) {
 	}
 }
 
-func Scan(user string, groups string, dirpath string) {
+func Scan(user string, groups string, dirpath string, SUIDFilesChan chan []map[string]string, SGIDFilesChan chan []map[string]string, writableFilesChan chan []map[string]string) {
 	// SUID、SGID可执行文件和可写文件
 	var SUIDFiles, SGIDFiles, writableFiles []map[string]string
 	filepath.Walk(dirpath, func(path string, info fs.FileInfo, err error) error {
@@ -69,7 +69,7 @@ func Scan(user string, groups string, dirpath string) {
 		return nil
 	})
 
-	output(SUIDFiles, "SUID executable")
-	output(SGIDFiles, "SGID executable")
-	output(writableFiles, "Writable")
+	SUIDFilesChan <- SUIDFiles
+	SGIDFilesChan <- SGIDFiles
+	writableFilesChan <- writableFiles
 }
