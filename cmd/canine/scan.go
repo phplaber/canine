@@ -57,13 +57,16 @@ func Scan(user string, groups string, dirpath string, SUIDFilesChan chan []map[s
 		// 2、文件属组在 groups 中，且有 w 权限
 		// 3、其它用户有 w 权限
 		if (owner == user && m&0200 != 0) || (strings.Contains(groups, group) && m&0020 != 0) || m&0002 != 0 {
-			writableFiles = append(writableFiles, map[string]string{
-				"ftype":   ftype,
-				"perm":    perm,
-				"owner":   owner,
-				"group":   group,
-				"absPath": abspath,
-			})
+			// 排除 /data/data/、/data/media/和/data/user_de/ 下的文件
+			if !strings.Contains(abspath, "/data/data/") && !strings.Contains(abspath, "/data/media/") && !strings.Contains(abspath, "/data/user_de/") {
+				writableFiles = append(writableFiles, map[string]string{
+					"ftype":   ftype,
+					"perm":    perm,
+					"owner":   owner,
+					"group":   group,
+					"absPath": abspath,
+				})
+			}
 		}
 
 		return nil
